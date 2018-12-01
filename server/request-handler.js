@@ -37,7 +37,7 @@ var requestHandler = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   // The outgoing status.
-  var statusCode = 200;
+  var statusCode = 404;
 
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
@@ -47,43 +47,39 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = 'application/json';
-  response.writeHead(statusCode, headers);
+  
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   const {method, url} = request;
-  let body = {
+  let _storage = {
     results: [],
   };
   
   
   if (url === '/classes/messages') {
     if (method === 'POST') {
-      request.pipe(response);
+      statusCode = 201;
+      // _storage.results.push
     } else if (method === 'GET') {
+      statusCode = 200;
       request.on('GET', (chunk) => {
-        body.results.push(chunk.data);
+        _storage.results.push(chunk.data);
       });
-    } else {
-      response.statusCode = 404;
-      response.end();
-    }
-  } else {
-    response.statusCode = 404;
-    response.end();
+    } 
   }
-
-  response.end(JSON.stringify(body));
+  response.writeHead(statusCode, headers);
+  response.end(JSON.stringify(_storage));
 
   // request.on('GET', (chunk) => {
-  //   body.push(chunk);
+  //   _storage.push(chunk);
   // }).on('end', () => {
-  //   body = Buffer.concat(body).toString();
-  //   response.end(JSON.stringify(body));
+  //   _storage = Buffer.concat(_storage).toString();
+  //   response.end(JSON.stringify(_storage));
   // });
   
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
-  // response.end() will be the body of the response - i.e. what shows
+  // response.end() will be the _storage of the response - i.e. what shows
   // up in the browser.
   //
   // Calling .end "flushes" the response's internal buffer, forcing
