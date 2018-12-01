@@ -47,25 +47,39 @@ var requestHandler = function(request, response) {
   // You will need to change this if you are sending something
   // other than plain text, like JSON or HTML.
   headers['Content-Type'] = 'application/json';
-
+  response.writeHead(statusCode, headers);
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   const {method, url} = request;
-  let body = [];
+  let body = {
+    results: [],
+  };
+  
+  
+  if (url === '/classes/messages') {
+    if (method === 'POST') {
+      request.pipe(response);
+    } else if (method === 'GET') {
+      request.on('GET', (chunk) => {
+        body.results.push(chunk.data);
+      });
+    } else {
+      response.statusCode = 404;
+      response.end();
+    }
+  } else {
+    response.statusCode = 404;
+    response.end();
+  }
 
-  request.on('GET', (chunk) => {
-    body.push(chunk);
-  }).on('end', () => {
-    body = Buffer.concat(body).toString();
-    response.end(JSON.stringify(body));
-  });
-  // body = Buffer.concat(body).toString();
+  response.end(JSON.stringify(body));
 
-  // response.writeHead(statusCode, headers);
-
-  // var responseBody = {headers, method, url, body};
-
-  // response.write(JSON.stringify(responseBody));
+  // request.on('GET', (chunk) => {
+  //   body.push(chunk);
+  // }).on('end', () => {
+  //   body = Buffer.concat(body).toString();
+  //   response.end(JSON.stringify(body));
+  // });
   
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
