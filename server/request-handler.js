@@ -60,10 +60,15 @@ var requestHandler = function(request, response) {
   if (url === '/classes/messages') {
     if (method === 'POST') {
       statusCode = 201;
+      var body = '';
       request.on('data', (chunk) => {
-        console.log(JSON.stringify(chunk));
-        storage._data.results.push(JSON.stringify(chunk));
+        console.log(JSON.parse(chunk));
+        body += chunk;
+        // storage._data.results.push(JSON.stringify(chunk));
       });
+      request.on('end', function() {
+        storage._data.results.push(JSON.parse(body));
+      })
     } else if (method === 'GET') {
       statusCode = 200;
     } 
