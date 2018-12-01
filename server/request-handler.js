@@ -43,7 +43,6 @@ var requestHandler = function(request, response) {
   console.log('Serving request type ' + request.method + ' for url ' + request.url);
 
   // The outgoing status.
-  var statusCode;
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
@@ -57,39 +56,39 @@ var requestHandler = function(request, response) {
   // which includes the status and all headers.
   const {method, url} = request;
   
-  if (url !== '/arglebargle') {
+  if (url === '/classes/messages') {
     if (method === 'POST') {
-      statusCode = 201;
       var body = '';
       request.on('data', (chunk) => {
-        // console.log(JSON.parse(chunk));
         body += chunk;
-        // storage._data.results.push(JSON.stringify(chunk));
       });
       request.on('end', function() {
         console.log(JSON.parse(body));
         storage._data.results.push(JSON.parse(body));
       });
-    } else if (method === 'GET') {
-      statusCode = 200;
-    } else if (method === 'OPTIONS') {
-      statusCode = 202;
-    } else if (method === 'DELETE') {
-      statusCode = 500;
-    }
-    response.writeHead(statusCode, headers);
-    if (method === 'OPTIONS') {
-      response.end(JSON.stringify(defaultCorsHeaders));
-    } else if (method === 'DELETE') {
-      response.end(`${statusCode}: Cannot delete from storage.`);
-    } else {
+      response.writeHead(201, headers);
       response.end(JSON.stringify(storage._data));
+    } else if (method === 'GET') {
+      response.writeHead(200, headers);
+      response.end(JSON.stringify(storage._data));
+    } else if (method === 'OPTIONS') {
+      response.writeHead(202, headers);
+      response.end();
+    } else if (method === 'DELETE') {
+      response.writeHead(500, 'Cannot delete from storage');
+      response.end();
     }
   } else {
-    statusCode = 404;
-    response.writeHead(statusCode, headers);
+    response.writeHead(404, headers);
     response.end(JSON.stringify(storage._data));
   }
+
+  // request.on('GET', (chunk) => {
+  //   _data.push(chunk);
+  // }).on('end', () => {
+  //   _data = Buffer.concat(_data).toString();
+  //   response.end(JSON.stringify(_data));
+  // });
   
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
