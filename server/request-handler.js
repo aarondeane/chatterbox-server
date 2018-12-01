@@ -12,6 +12,12 @@ this file and include it in basic-server.js so that it actually works.
 
 **************************************************************/
 
+// var _data = {
+//   results: []
+// };
+
+var storage = require('./storage.js');
+
 var defaultCorsHeaders = {
   'access-control-allow-origin': '*',
   'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
@@ -38,7 +44,6 @@ var requestHandler = function(request, response) {
 
   // The outgoing status.
   var statusCode = 404;
-
   // See the note below about CORS headers.
   var headers = defaultCorsHeaders;
 
@@ -51,39 +56,37 @@ var requestHandler = function(request, response) {
   // .writeHead() writes to the request line and headers of the response,
   // which includes the status and all headers.
   const {method, url} = request;
-  let _storage = {
-    results: [],
-  };
-  
   
   if (url === '/classes/messages') {
     if (method === 'POST') {
       statusCode = 201;
-      // _storage.results.push
+      request.on('data', (chunk) => {
+        console.log(chunk);
+        storage._data.results.push(chunk);
+      });
     } else if (method === 'GET') {
       statusCode = 200;
-      request.on('GET', (chunk) => {
-        _storage.results.push(chunk.data);
-      });
+      response.writeHead(statusCode, headers);
+      response.end(JSON.stringify(storage._data));
     } 
   }
-  response.writeHead(statusCode, headers);
-  response.end(JSON.stringify(_storage));
+  // response.writeHead(statusCode, headers);
+  // response.end(JSON.stringify(storage._data));
 
   // request.on('GET', (chunk) => {
-  //   _storage.push(chunk);
+  //   _data.push(chunk);
   // }).on('end', () => {
-  //   _storage = Buffer.concat(_storage).toString();
-  //   response.end(JSON.stringify(_storage));
+  //   _data = Buffer.concat(_data).toString();
+  //   response.end(JSON.stringify(_data));
   // });
   
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
-  // response.end() will be the _storage of the response - i.e. what shows
+  // response.end() will be the _data of the response - i.e. what shows
   // up in the browser.
   //
   // Calling .end "flushes" the response's internal buffer, forcing
-  // node to actually send all the data over to the client.
+  // node to actually send all the _data over to the client.
   // response.end('Hello, World!');
 };
 
