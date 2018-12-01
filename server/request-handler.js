@@ -61,17 +61,15 @@ var requestHandler = function(request, response) {
     if (method === 'POST') {
       statusCode = 201;
       request.on('data', (chunk) => {
-        console.log(chunk);
-        storage._data.results.push(chunk);
+        console.log(JSON.stringify(chunk));
+        storage._data.results.push(JSON.stringify(chunk));
       });
     } else if (method === 'GET') {
       statusCode = 200;
-      response.writeHead(statusCode, headers);
-      response.end(JSON.stringify(storage._data));
     } 
   }
-  // response.writeHead(statusCode, headers);
-  // response.end(JSON.stringify(storage._data));
+  response.writeHead(statusCode, headers);
+  response.end(JSON.stringify(storage._data));
 
   // request.on('GET', (chunk) => {
   //   _data.push(chunk);
