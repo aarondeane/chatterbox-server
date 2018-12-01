@@ -103,4 +103,36 @@ describe('Node Server Request Listener Function', function() {
     expect(res._ended).to.equal(true);
   });
 
+  it('Should handle options requests', function () {
+    var stubMsg = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+    
+    var req = new stubs.request('/classes/messages', 'OPTIONS', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+    expect(res._responseCode).to.eql(202);
+    var optionHeaders = JSON.parse(res._data);
+    expect(res._headers).to.eql(optionHeaders);
+
+  });
+
+  it('Should handle delete requests', function () {
+    var stubMsg = {
+      username: 'Jono',
+      text: 'Do my bidding!'
+    };
+    
+    var req = new stubs.request('/classes/messages', 'DELETE', stubMsg);
+    var res = new stubs.response();
+
+    handler.requestHandler(req, res);
+    expect(res._responseCode).to.eql(500);
+    expect(res._data).to.equal('500: Cannot delete from storage.');
+    // expect
+
+  });
+
 });
