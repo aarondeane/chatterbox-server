@@ -57,7 +57,7 @@ var requestHandler = function(request, response) {
   // which includes the status and all headers.
   const {method, url} = request;
   
-  if (url === '/classes/messages') {
+  if (url !== '/arglebargle') {
     if (method === 'POST') {
       statusCode = 201;
       var body = '';
@@ -90,13 +90,6 @@ var requestHandler = function(request, response) {
     response.writeHead(statusCode, headers);
     response.end(JSON.stringify(storage._data));
   }
-
-  // request.on('GET', (chunk) => {
-  //   _data.push(chunk);
-  // }).on('end', () => {
-  //   _data = Buffer.concat(_data).toString();
-  //   response.end(JSON.stringify(_data));
-  // });
   
   // Make sure to always call response.end() - Node may not send
   // anything back to the client until you do. The string you pass to
