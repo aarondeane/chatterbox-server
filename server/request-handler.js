@@ -75,7 +75,7 @@ var requestHandler = function(request, response) {
       response.writeHead(202, headers);
       response.end();
     } else if (method === 'DELETE') {
-      response.writeHead(500, 'Cannot delete from storage');
+      response.writeHead(500, '500: Cannot delete from storage.');
       response.end();
     }
   } else {

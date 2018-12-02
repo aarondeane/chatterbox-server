@@ -111,11 +111,17 @@ describe('Node Server Request Listener Function', function() {
     
     var req = new stubs.request('/classes/messages', 'OPTIONS', stubMsg);
     var res = new stubs.response();
+    var defaultCorsHeaders = {
+      'Content-Type': 'application/json',
+      'access-control-allow-origin': '*',
+      'access-control-allow-methods': 'GET, POST, PUT, DELETE, OPTIONS',
+      'access-control-allow-headers': 'content-type, accept',
+      'access-control-max-age': 10 // Seconds.
+    };
 
     handler.requestHandler(req, res);
     expect(res._responseCode).to.eql(202);
-    var optionHeaders = JSON.parse(res._data);
-    expect(res._headers).to.eql(optionHeaders);
+    expect(res._headers).to.eql(defaultCorsHeaders);
 
   });
 
@@ -130,7 +136,7 @@ describe('Node Server Request Listener Function', function() {
 
     handler.requestHandler(req, res);
     expect(res._responseCode).to.eql(500);
-    expect(res._data).to.equal('500: Cannot delete from storage.');
+    expect(res._headers).to.equal('500: Cannot delete from storage.');
     // expect
 
   });
